@@ -7,6 +7,11 @@ import java.util.concurrent.TimeUnit;
 
 public class ExamRepositoryAn implements IExamRepository {
     @Override
+    public Exam save(Exam exam) {
+        return null;
+    }
+
+    @Override
     public List<Exam> findAll() {
         try {
             System.out.println("Find All");
