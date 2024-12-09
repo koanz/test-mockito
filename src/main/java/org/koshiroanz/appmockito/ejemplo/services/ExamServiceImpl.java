@@ -1,17 +1,17 @@
 package org.koshiroanz.appmockito.ejemplo.services;
 
 import org.koshiroanz.appmockito.ejemplo.models.Exam;
-import org.koshiroanz.appmockito.ejemplo.repositories.IExamRepository;
-import org.koshiroanz.appmockito.ejemplo.repositories.IQuestionRepository;
+import org.koshiroanz.appmockito.ejemplo.repositories.ExamRepository;
+import org.koshiroanz.appmockito.ejemplo.repositories.QuestionRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public class ExamServiceImpl implements IExamService {
-    private IExamRepository repository;
-    private IQuestionRepository questionRepository;
+public class ExamServiceImpl implements ExamService {
+    private ExamRepository repository;
+    private QuestionRepository questionRepository;
 
-    public ExamServiceImpl(IExamRepository repository, IQuestionRepository questionRepository) {
+    public ExamServiceImpl(ExamRepository repository, QuestionRepository questionRepository) {
         this.repository = repository;
         this.questionRepository = questionRepository;
     }
