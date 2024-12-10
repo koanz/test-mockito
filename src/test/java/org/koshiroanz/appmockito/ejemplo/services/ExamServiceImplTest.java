@@ -288,22 +288,63 @@ class ExamServiceImplTest {
     }
 
     @Test
-    void testSpy() {
-        ExamRepository examRepository = spy(ExamRepositoryImpl.class);
-        QuestionRepository questionRepository = spy(QuestionRepositoryImpl.class);
-        ExamService examService = new ExamServiceImpl(examRepository, questionRepository);
+    void testOrderOfInvocationsWithOneRepository() {
+        when(repository.findAll()).thenReturn(Data.EXAMS);
 
-        List<String> questions = Arrays.asList("aritmética");
-        //when(questionRepository.findQuestionByExamId(anyLong())).thenReturn(questions);
-        doReturn(questions).when(questionRepository).findQuestionByExamId(anyLong());
+        service.findByNameWithQuestions("Matemáticas");
+        service.findByNameWithQuestions("Sistemas de Información");
 
-        Exam exam = examService.findByNameWithQuestions("Matemáticas");
-        assertEquals(1, exam.getId());
-        assertEquals("Matemáticas", exam.getName());
-        assertEquals(1, exam.getQuestions().size());
-        assertTrue(exam.getQuestions().contains("aritmética"));
+        InOrder inOrder = inOrder(questionRepository);
+        inOrder.verify(questionRepository).findQuestionByExamId(1L);
+        inOrder.verify(questionRepository).findQuestionByExamId(3L);
+    }
 
-        verify(examRepository).findAll();
-        verify(questionRepository).findQuestionByExamId(anyLong());
+    @Test
+    void testOrderOfInvocationWithRepositories() {
+        when(repository.findAll()).thenReturn(Data.EXAMS);
+
+        service.findByNameWithQuestions("Matemáticas");
+        service.findByNameWithQuestions("Sistemas de Información");
+
+        InOrder inOrder = inOrder(repository, questionRepository);
+        inOrder.verify(repository).findAll();
+        inOrder.verify(questionRepository).findQuestionByExamId(1L);
+
+        inOrder.verify(repository).findAll();
+        inOrder.verify(questionRepository).findQuestionByExamId(3L);
+    }
+
+    @Test
+    void testNumberOfInvocations() {
+        when(repository.findAll()).thenReturn(Data.EXAMS);
+
+        service.findByNameWithQuestions("Matemáticas");
+        //service.findByNameWithQuestions("Sistemas de Información");
+
+        InOrder inOrder = inOrder(repository, questionRepository);
+        // verify() => (default value = 1) se invoca 1 sola vez por defecto.
+        verify(repository).findAll();
+        // times(x) => (default value = 1) espera n veces la invocación.
+        verify(repository, times(1)).findAll();
+        // atLeastOnce() => constante de que al menos una sola vez se invoque.
+        verify(repository, atLeastOnce()).findAll();
+        // atLeast(x) => espera al menos una invocación.
+        verify(questionRepository, atLeast(1)).findQuestionByExamId(anyLong());
+        // atMost(x) => espera un valor máximo de invocaciones.
+        verify(questionRepository, atMost(2)).findQuestionByExamId(anyLong());
+        // atMostOnce() => constante como valor máximo de 1 sola invocación.
+        verify(questionRepository, atMostOnce()).findQuestionByExamId(anyLong());
+    }
+
+    @Test
+    void testNumberOfInvocations2() {
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+
+        service.findByNameWithQuestions("Matemáticas");
+        verify(questionRepository, never()).findQuestionByExamId(1L);
+        verifyNoInteractions(questionRepository);
+
+        verify(repository).findAll();
+        verify(repository, times(1)).findAll();
     }
 }
