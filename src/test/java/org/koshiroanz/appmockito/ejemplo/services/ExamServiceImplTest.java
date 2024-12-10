@@ -17,6 +17,7 @@ import org.mockito.stubbing.Answer;
 
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -292,12 +293,17 @@ class ExamServiceImplTest {
         QuestionRepository questionRepository = spy(QuestionRepositoryImpl.class);
         ExamService examService = new ExamServiceImpl(examRepository, questionRepository);
 
-        when(questionRepository.findQuestionByExamId(anyLong())).thenReturn(Data.QUESTIONS);
+        List<String> questions = Arrays.asList("aritmética");
+        //when(questionRepository.findQuestionByExamId(anyLong())).thenReturn(questions);
+        doReturn(questions).when(questionRepository).findQuestionByExamId(anyLong());
 
         Exam exam = examService.findByNameWithQuestions("Matemáticas");
         assertEquals(1, exam.getId());
         assertEquals("Matemáticas", exam.getName());
-        assertEquals(5, exam.getQuestions().size());
+        assertEquals(1, exam.getQuestions().size());
         assertTrue(exam.getQuestions().contains("aritmética"));
+
+        verify(examRepository).findAll();
+        verify(questionRepository).findQuestionByExamId(anyLong());
     }
 }

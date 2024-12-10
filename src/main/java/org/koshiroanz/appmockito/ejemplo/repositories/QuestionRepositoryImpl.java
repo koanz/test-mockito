@@ -16,7 +16,7 @@ public class QuestionRepositoryImpl implements QuestionRepository {
     public List<String> findQuestionByExamId(Long id) {
         System.out.println("QuestionRepositoryImpl.findQuestionByExamId()");
         try {
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.MILLISECONDS.sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
